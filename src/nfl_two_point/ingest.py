@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import time
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -11,10 +12,20 @@ import polars as pl
 from .config import AnalysisConfig
 
 
-def load_play_by_play(config: AnalysisConfig) -> pl.DataFrame:
-    """Fetch completed-season nflverse play-by-play data as a Polars frame."""
-    seasons = list(range(config.start_season, config.end_season + 1))
-    frame = nfl.load_pbp(seasons)
+def load_play_by_play(config: AnalysisConfig, attempts: int = 3) -> pl.DataFrame:
+    """Fetch seasons individually so transient upstream failures can be retried."""
+    frames: list[pl.DataFrame] = []
+    for season in range(config.start_season, config.end_season + 1):
+        for attempt in range(1, attempts + 1):
+            try:
+                print(f"Loading {season} (attempt {attempt}/{attempts})...", flush=True)
+                frames.append(nfl.load_pbp(season))
+                break
+            except ConnectionError:
+                if attempt == attempts:
+                    raise
+                time.sleep(2**attempt)
+    frame = pl.concat(frames)
     if not config.include_playoffs:
         frame = frame.filter(pl.col("season_type") == "REG")
     return frame
