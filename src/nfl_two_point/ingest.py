@@ -25,7 +25,8 @@ def load_play_by_play(config: AnalysisConfig, attempts: int = 3) -> pl.DataFrame
                 if attempt == attempts:
                     raise
                 time.sleep(2**attempt)
-    frame = pl.concat(frames)
+    # nflverse's parquet schema evolves across seasons; safely promote compatible types.
+    frame = pl.concat(frames, how="diagonal_relaxed")
     if not config.include_playoffs:
         frame = frame.filter(pl.col("season_type") == "REG")
     return frame
