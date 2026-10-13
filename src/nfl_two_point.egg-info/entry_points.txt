@@ -1,2 +1,0 @@
-[console_scripts]
-nfl-two-point = nfl_two_point.cli:main
