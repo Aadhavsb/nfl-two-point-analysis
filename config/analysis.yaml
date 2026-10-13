@@ -1,0 +1,12 @@
+start_season: 2010
+end_season: 2025
+include_playoffs: true
+regulation_only: true
+pat_era_cutover: 2015
+random_seed: 7
+bootstrap_draws: 1000
+recommendation_margin_pp: 0.10
+splits:
+  development_end: 2019
+  validation_end: 2022
+  test_end: 2025

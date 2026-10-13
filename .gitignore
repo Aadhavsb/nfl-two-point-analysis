@@ -1,0 +1,10 @@
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.venv/
+data/raw/
+data/processed/
+data/models/
+reports/_freeze/
+reports/*.html
+notebooks/*.executed.ipynb

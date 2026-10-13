@@ -1,0 +1,36 @@
+---
+title: "NFL Two-Point Decisions, In the Moment"
+format: html
+jupyter: python3
+---
+
+## Question
+
+At the instant after a touchdown and before the conversion try, which action has the larger expected win probability: a PAT, a two-point try, or neither with enough certainty to recommend? This report does **not** grade historical coaches after outcomes are known.
+
+## Decision calculation
+
+For touchdown-only score margin $m$, calculate the win probability for a failed try ($m$), made PAT ($m+1$), and made two-point try ($m+2$):
+
+$$EWP_{two}=p_2 WP(m+2)+(1-p_2)WP(m)$$
+
+$$EWP_{kick}=p_{PAT} WP(m+1)+(1-p_{PAT})WP(m)$$
+
+A recommendation is `indeterminate` when uncertainty spans zero. The state-specific break-even rate makes every result inspectable.
+
+## Validation contract
+
+The data/model split is chronological: development seasons 2010–2019, model-selection seasons 2020–2022, and a locked test period of 2023–2025. Evaluate probability quality with Brier score, log loss, and calibration—especially in score/time states near conversion decisions. Do not inspect the test set to tune features or thresholds.
+
+## Limitations
+
+Conversion attempts are selected strategically rather than randomly. Therefore this is conditional decision analysis combining a calibrated state-value model with observed execution-rate estimates. It does not establish the causal result of a different historical call, and it must not be used to rank past coaches.
+
+## Reproduce
+
+```bash
+uv run pytest
+uv run nfl-two-point build --config config/analysis.yaml
+```
+
+The generated `data/processed/` tables contain metrics, rolling-origin results, action-rate posteriors, and the decision cohort; raw play-by-play is intentionally not committed.
