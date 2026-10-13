@@ -1,0 +1,16 @@
+[Unit]
+Description=Build the NFL two-point decision model
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=bhara
+Group=bhara
+WorkingDirectory=/home/bhara/repos/nfl-two-point-analysis
+Environment=HOME=/home/bhara
+ExecStart=/home/bhara/repos/nfl-two-point-analysis/scripts/run_build.sh
+TimeoutStartSec=infinity
+
+[Install]
+WantedBy=multi-user.target
